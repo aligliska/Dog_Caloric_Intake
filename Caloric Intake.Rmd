@@ -1,0 +1,85 @@
+---
+title: "Dog Caloric Intake"
+author: "Alice Gee"
+date: "1/25/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Visualization and Guide to Feeding your Dog/Puppy
+*This page details the general recommendation of how many calories to feed your dog. The categories are separated based on activity level and age (i.e. puppy vs. adult). Make sure to consult with your vet before making drastic changes to your pet's diet. Remember to monitor and adjust your diet based on your dog's condition.*
+
+## Caloric Intake for Standard Adult Dog (per Weight)
+```{r message=FALSE, warning=FALSE}
+library(dplyr)
+library(ggplot2)
+weight = c(3:200)
+calories = round((weight/2.2)^0.75 * 70)
+
+info_df = data.frame(weight_lbs = weight, RER_cal = calories, 
+                     fixed_cal = round(calories * 1.6), intact_cal = round(calories * 1.8))
+#table for weight vs. caloric intake 
+info_df %>% group_by(weight_lbs) %>% filter(!weight_lbs%%5) %>% knitr::kable()
+
+# plot for weight vs. caloric intake 
+info_df %>% ggplot(aes(x = weight_lbs)) + geom_line(aes(y=RER_cal, colour = "RER_cal")) + 
+  geom_line(aes(y=fixed_cal, colour = "fixed_cal")) + 
+  geom_line(aes(y=intact_cal, colour = "intact_cal")) + 
+  scale_x_continuous(breaks = seq(0, 200, by = 10)) +
+  scale_y_continuous(breaks = seq(0, 4000, by = 250)) +
+  ggtitle("Weight vs. Caloric Intake") + xlab("Weight (lbs)") + ylab("Calories (kcal)") + 
+  theme(plot.title = element_text(hjust = 0.5)) + 
+  scale_colour_manual("", breaks = c("RER_cal", "fixed_cal", "intact_cal"), 
+                      values = c("black", "blue", "red"))
+```
+
+*For a standard dog (i.e. indoor, light exercise), follow these recommendations. The `RER_cal` is the minimum amount of calories a dog should eat at that [ideal] weight. This is the "Resting Energy Requirements", that need to be fulfilled for your dog to function and stay healthy. In general, intact dogs will burn more calories than fixed dogs (i.e. neutered or spayed). Adjust portion sizes of your dog depending on activity level and how their weight changes accordingly.*
+
+
+## Caloric Intake for Non_Standard Adult Dog (per Weight)
+```{r}
+info_df = data.frame(weight_lbs = weight, 
+                     inactive_cal = round(calories * 1.2), minActive_cal = round(calories * 2), 
+                     modActive_cal = round(calories * 3.5), maxActive_cal = round(calories*5))
+#table for weight vs. caloric intake 
+info_df %>% group_by(weight_lbs) %>% filter(!weight_lbs%%5) %>% knitr::kable()
+
+# plot for weight vs. caloric intake 
+info_df %>% ggplot(aes(x = weight_lbs)) + geom_line(aes(y=inactive_cal, colour = "inactive_cal")) +
+  geom_line(aes(y=minActive_cal, colour = "minActive_cal")) + 
+  geom_line(aes(y=modActive_cal, colour = "modActive_cal")) + 
+  geom_line(aes(y=maxActive_cal, colour = "maxActive_cal")) + 
+  scale_x_continuous(breaks = seq(0, 200, by = 10)) +
+  scale_y_continuous(breaks = seq(0, 12000, by = 1000)) +
+  ggtitle("Weight vs. Caloric Intake") + xlab("Weight (lbs)") + ylab("Calories (kcal)") + 
+  theme(plot.title = element_text(hjust = 0.5)) + 
+  scale_colour_manual("", breaks = c("inactive_cal", "minActive_cal", "modActive_cal", "maxActive_cal"), 
+                      values = c("black", "blue", "red", "purple"))
+```
+
+*The amount of calories a dog should intake varies greatly depending on activity level. Follow these caloric intake recommendations as a baseline of how much to feed your dog. Adjust their diet depending on how much eight they gain or lose. Genetics plays a large role in the dog's metabolism. If your dog gains weight easily, follow the recommendations for the RER_cal (from the previous section) or inactive_cal. The range for how much an active dog eats can vary depending on sport and breeds, ranging from 2-5x the RER_cal recommendation. Remember to monitor your own dog's performance and condition when making adjustments to diet. Please consult with your vet or a veterinary nutritionist for finer details! *
+
+## Caloric Intake for Puppies (per Weight)
+```{r}
+info_df = data.frame(weight_lbs = weight, 
+                     ZeroToFour_cal = round(calories * 3), FourToAdult_cal = round(calories * 2))
+#table for weight vs. caloric intake 
+info_df %>% group_by(weight_lbs) %>% filter(!weight_lbs%%5) %>% knitr::kable()
+
+# plot for weight vs. caloric intake 
+info_df %>% ggplot(aes(x = weight_lbs)) + geom_line(aes(y=ZeroToFour_cal, colour = "ZeroToFour_cal")) +
+  geom_line(aes(y=FourToAdult_cal, colour = "FourToAdult_cal")) + 
+  scale_x_continuous(breaks = seq(0, 200, by = 10)) +
+  scale_y_continuous(breaks = seq(0, 12000, by = 1000)) +
+  ggtitle("Weight vs. Caloric Intake") + xlab("Weight (lbs)") + ylab("Calories (kcal)") + 
+  theme(plot.title = element_text(hjust = 0.5)) + 
+  scale_colour_manual("", breaks = c("ZeroToFour_cal", "FourToAdult_cal"), 
+                      values = c("blue", "red"))
+```
+
+*Growing puppies are recommended to eat twice as much as adult dogs. During the first 4 months, puppies are recommended to follow the `ZeroToFour_cal` caloric intake. From 4 months to adulthood, puppies are recommeneded to follow the `FourToAdult_cal` caloric intake. Make sure to calculate caloric intake based on the puppy's current weight. Adjust portion sizes as your puppy grows. It is very important for the puppy to get enough nutrients when growing. Check with your vet to make sure your puppy is meeting its growth milestones and developing properly (i.e. physically and mentally).* 
+
+
